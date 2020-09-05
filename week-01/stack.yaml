@@ -1,0 +1,39 @@
+Parameters:
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair
+Resources:
+  CoappinLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData:
+        ImageId: ami-0bcc094591f354be2
+        InstanceType: t2.micro
+        KeyName: !Ref KeyName
+        SecurityGroups:
+        - !Ref FoounderSecurityGroup
+        UserData:
+          Fn::Base64: |
+            #!/usr/bin/env bash
+            set -o errexit
+            sudo apt-get update
+            sudo apt-get install -y openjdk-8-jdk
+  FoounderSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: "22"
+        ToPort: "22"
+        CidrIp: 0.0.0.0/0
+  HurntabAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones:
+        Fn::GetAZs: ""
+      LaunchTemplate:
+        LaunchTemplateId: !Ref CoappinLaunchTemplate
+        Version: !GetAtt CoappinLaunchTemplate.LatestVersionNumber
+      MinSize: "2"
+      MaxSize: "2"
