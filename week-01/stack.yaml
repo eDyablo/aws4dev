@@ -21,7 +21,7 @@ Resources:
   FoounderSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable SSH access via port 22
+      GroupDescription: Enable access
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: "22"
